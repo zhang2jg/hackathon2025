@@ -6,7 +6,7 @@ import autogen
 
 llm_config_local = {"config_list": [{
     "model": "gpt-4o",
-    "api_key": "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",
+    "api_key": "<github_token>",
     "base_url": "https://models.inference.ai.azure.com"
 }]}
 
