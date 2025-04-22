@@ -1,0 +1,9 @@
+name: hackathon
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - fastapi
+  - uvicorn
+  - o365
+  - python-dotenv
