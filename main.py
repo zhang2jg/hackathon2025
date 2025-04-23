@@ -72,7 +72,7 @@ async def auth_callback(request: Request):
     )
 
     if result:
-        return RedirectResponse("http://localhost:8000/me")
+        return RedirectResponse(request.url_for('get_user_info'))
     else:
         raise HTTPException(status_code=400, detail="Authentication failed")
 
@@ -84,10 +84,11 @@ async def get_user_info():
         return RedirectResponse("/")  # Redirect to home if not authenticated
 
     # Fetch the user's profile
-    me = account.connection.get("/me")  # Microsoft Graph `/me` endpoint
+    me = account.connection.get("https://graph.microsoft.com/v1.0/me")  # Microsoft Graph `/me` endpoint
     if me.status_code == 200:
         user_info = me.json()
         return {
+            "id": user_info.get("id"),
             "name": user_info.get("displayName"),
             "email": user_info.get("mail"),
             "jobTitle": user_info.get("jobTitle"),
@@ -109,7 +110,7 @@ async def get_mail():
 
     # Fetch the first 10 messages in the inbox
     inbox = mailbox.inbox_folder()
-    messages = inbox.get_messages(limit=2, download_attachments=False)  # Limit to 2
+    messages = inbox.get_messages(limit=1, download_attachments=False)  # Limit to 1
 
     # Parse and return the email data
     email_data = []
