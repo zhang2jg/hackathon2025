@@ -1,9 +1,12 @@
 import os
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
 from O365 import Account, FileSystemTokenBackend
 from dotenv import load_dotenv
 from datetime import datetime
+from pathlib import Path
+import shutil
+import os
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -96,33 +99,68 @@ async def get_user_info():
     else:
         raise HTTPException(status_code=500, detail="Failed to fetch user information")
 
-@app.get("/mail")
-async def get_mail():
+@app.get("/emails")
+def get_emails():
     """
-    Example endpoint: Retrieve the user's mailbox messages.
-    Requires the 'Mail.Read' permission scope.
+    Fetch email messages from the authenticated user's inbox and download attachments.
     """
     if not account.is_authenticated:
-        return RedirectResponse("/")  # Redirect to home if not authenticated
+        return {"message": "User is not authenticated. Please login via /auth/login."}
 
-        # Access the mailbox
-    mailbox = account.mailbox()
+    try:
+        mailbox = account.mailbox()
+        query = mailbox.new_query().order_by("receivedDateTime", ascending=False)
+        messages = mailbox.inbox_folder().get_messages(query=query, limit=1)  # Get the latest 10 emails
 
-    # Fetch the first 10 messages in the inbox
-    inbox = mailbox.inbox_folder()
-    messages = inbox.get_messages(limit=1, download_attachments=False)  # Limit to 1
+        emails = []
+        download_path = Path("attachments")  # Directory to save attachments
+        download_path.mkdir(exist_ok=True)  # Create folder if it doesn't exist
 
-    # Parse and return the email data
-    email_data = []
-    for message in messages:
-        email_data.append({
-            "subject": message.subject,
-            "sender": message.sender.address,
-            "received": message.received.strftime("%Y-%m-%d %H:%M:%S"),
-            "body": message.body
-        })
+        for message in messages:
+            email_data = {
+                "subject": message.subject,
+                "sender": message.sender.address if message.sender else None,
+                "received": message.received.strftime('%Y-%m-%d %H:%M:%S') if message.received else None,
+                "has_attachments": message.has_attachments,
+                "attachments_saved": [],
+            }
 
-    return {"emails": email_data}
+            # Check if the email has attachments
+            if message.has_attachments:
+                attachments = message.attachments
+
+                for attachment in attachments:
+                    if attachment.is_file:  # Handle file attachments only
+                        file_path = download_path / attachment.name
+                        attachment.save_as(file_path)
+                        email_data["attachments_saved"].append(str(file_path))
+
+            emails.append(email_data)
+
+        return {"emails": emails}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch emails or download attachments: {str(e)}")
+
+
+@app.post("/upload-pdf/")
+async def upload_pdf(file: UploadFile = File(...)):
+    # for testing, use curl -X POST "http://127.0.0.1:8000/upload-pdf/" -F "file=@example.pdf"
+    # Check if the uploaded file is a PDF
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+
+    # Specify the path to save the uploaded file
+    uploaded_pdfs_path = Path("uploaded_pdfs")
+    uploaded_pdfs_path.mkdir(exist_ok=True)
+    file_path = os.path.join(uploaded_pdfs_path, file.filename)
+
+    # Save the file to the local file system
+    with open(file_path, "wb") as out_file:
+        # Write the file in chunks to avoid memory issues with large files
+        while content := await file.read(1024):  # Use async read
+            out_file.write(content)
+
+    return {"message": f"File '{file.filename}' uploaded successfully!", "path": file_path}
 
 @app.get("/calendar")
 async def get_calendar():

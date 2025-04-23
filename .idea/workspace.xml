@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="5096306e-b363-406a-8775-51b22e55c62c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/autogen_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/autogen_example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/github_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/github_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/o365_token.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tokens/o365_tokens.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +57,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\zhang\Desktop\hackathon\hackathon2025\examples" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="download_email" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="hackathon2025" />
@@ -151,7 +156,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/hackathon2025$download_email__1_.coverage" NAME="download_email (1) Coverage Results" MODIFIED="1744942800293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email/outlook" />
-    <SUITE FILE_PATH="coverage/hackathon2025$main.coverage" NAME="main Coverage Results" MODIFIED="1745378083944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/hackathon2025$main.coverage" NAME="main Coverage Results" MODIFIED="1745380273886" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/hackathon2025$download_email.coverage" NAME="download_email Coverage Results" MODIFIED="1744942365434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
