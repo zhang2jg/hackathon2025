@@ -1,2 +1,3 @@
 .env
 .idea/
+**/o365_token.txt

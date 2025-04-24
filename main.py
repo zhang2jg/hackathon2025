@@ -5,8 +5,9 @@ from O365 import Account, FileSystemTokenBackend
 from dotenv import load_dotenv
 from datetime import datetime
 from pathlib import Path
-import shutil
+import re
 import os
+import subprocess
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -19,6 +20,7 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 TOKEN_FILENAME = os.getenv("TOKEN_FILENAME", "o365_tokens")
 SCOPES = ['Mail.Read', 'Calendars.ReadWrite']  # Adjust the scopes as per your needs
+wkhtmltopdf_path = "/mnt/c/tmp/wkhtmltopdf/bin/wkhtmltopdf.exe"
 
 # Initialize FastAPI
 app = FastAPI()
@@ -30,6 +32,14 @@ if TOKEN_FILENAME:
 
 account = Account((CLIENT_ID, CLIENT_SECRET), token_backend=token_backend)
 
+
+def run_powershell_command(command):
+    """Executes a PowerShell command and returns the output."""
+    try:
+        process = subprocess.run(command, capture_output=True, text=True, check=True)
+        return process.stdout
+    except subprocess.CalledProcessError as e:
+        return f"Error: {e.stderr}"
 @app.get("/")
 async def index():
     return {"message": "Welcome! Visit /auth to authenticate with Microsoft 365"}
@@ -100,7 +110,7 @@ async def get_user_info():
         raise HTTPException(status_code=500, detail="Failed to fetch user information")
 
 @app.get("/emails")
-def get_emails():
+async def get_emails():
     """
     Fetch email messages from the authenticated user's inbox and download attachments.
     """
@@ -113,17 +123,31 @@ def get_emails():
         messages = mailbox.inbox_folder().get_messages(query=query, limit=1)  # Get the latest 10 emails
 
         emails = []
-        download_path = Path("attachments")  # Directory to save attachments
+        download_path = Path("emails")  # Directory to save attachments
         download_path.mkdir(exist_ok=True)  # Create folder if it doesn't exist
 
         for message in messages:
+            # print(f"dir(message) = {dir(message)}")
             email_data = {
                 "subject": message.subject,
                 "sender": message.sender.address if message.sender else None,
                 "received": message.received.strftime('%Y-%m-%d %H:%M:%S') if message.received else None,
+                "body_preview": message.body_preview,
                 "has_attachments": message.has_attachments,
                 "attachments_saved": [],
             }
+
+            # Save the email body to a html file
+            html_file_path = os.path.join(download_path,
+                                   re.sub(r'[^0-9a-zA-Z]+','_', message.subject) + '.html')
+            with open(html_file_path, "wb") as out_file:
+                out_file.write(message.body.encode('utf-8'))
+
+            # Convert the HTML file to PDF
+            command = [wkhtmltopdf_path, html_file_path, html_file_path.split(".html")[0] + '.pdf']
+            print(f"subprocess command: {command}")
+            output = run_powershell_command(command)
+            print(f"subprocess output: {output}")
 
             # Check if the email has attachments
             if message.has_attachments:
@@ -216,6 +240,7 @@ async def create_event():
         return {"message": "Event created successfully"}
     else:
         raise HTTPException(status_code=500, detail="Failed to create event")
+
 
 if __name__ == "__main__":
     import uvicorn

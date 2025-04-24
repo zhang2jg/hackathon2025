@@ -7,3 +7,4 @@ dependencies:
   - uvicorn
   - o365
   - python-dotenv
+  - python-pdfkit
