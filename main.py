@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, Request, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
+from pydantic import BaseModel
 from O365 import Account, FileSystemTokenBackend
 from dotenv import load_dotenv
 from datetime import datetime
@@ -8,6 +9,7 @@ from pathlib import Path
 import re
 import os
 import subprocess
+from utils import ocr_pdf, run_llm
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -19,6 +21,7 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 TOKEN_FILENAME = os.getenv("TOKEN_FILENAME", "o365_tokens")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SCOPES = ['Mail.Read', 'Calendars.ReadWrite']  # Adjust the scopes as per your needs
 wkhtmltopdf_path = "/mnt/c/tmp/wkhtmltopdf/bin/wkhtmltopdf.exe"
 
@@ -32,6 +35,13 @@ if TOKEN_FILENAME:
 
 account = Account((CLIENT_ID, CLIENT_SECRET), token_backend=token_backend)
 
+
+class CalendarEvent(BaseModel):
+    subject: str
+    body: str
+    start_date: str = None
+    end_date: str = None
+    remind_before_minutes: int = 30
 
 def run_powershell_command(command):
     """Executes a PowerShell command and returns the output."""
@@ -137,18 +147,6 @@ async def get_emails():
                 "attachments_saved": [],
             }
 
-            # Save the email body to a html file
-            html_file_path = os.path.join(download_path,
-                                   re.sub(r'[^0-9a-zA-Z]+','_', message.subject) + '.html')
-            with open(html_file_path, "wb") as out_file:
-                out_file.write(message.body.encode('utf-8'))
-
-            # Convert the HTML file to PDF
-            command = [wkhtmltopdf_path, html_file_path, html_file_path.split(".html")[0] + '.pdf']
-            print(f"subprocess command: {command}")
-            output = run_powershell_command(command)
-            print(f"subprocess output: {output}")
-
             # Check if the email has attachments
             if message.has_attachments:
                 attachments = message.attachments
@@ -160,6 +158,37 @@ async def get_emails():
                         email_data["attachments_saved"].append(str(file_path))
 
             emails.append(email_data)
+
+            # Save the email body to a html file
+            html_file_path = os.path.join(download_path,
+                                   re.sub(r'[^0-9a-zA-Z]+','_', message.subject).strip('_') + '.html')
+            with open(html_file_path, "wb") as out_file:
+                out_file.write(message.body.encode('utf-8'))
+
+            # Convert the HTML file to PDF
+            pdf_file_path = html_file_path.split(".html")[0] + '.pdf'
+            command = [wkhtmltopdf_path, html_file_path, pdf_file_path]
+            print(f"subprocess command: {command}")
+            output = run_powershell_command(command)
+            print(f"subprocess output: {output}")
+
+            # Run ocr to extract text from the pdf
+            txt_file_path = html_file_path.split(".html")[0] + '.txt'
+            print("OCR in progress....")
+            ocr_text = ocr_pdf(pdf_file_path)
+            with open(txt_file_path, "w") as out_file:
+                out_file.write(ocr_text)
+            print("OCR completed.")
+
+            # Run the LLM to extract events
+            print("Running LLM to summarize letter and extract events....")
+            llm_response = run_llm(ocr_text, token=GITHUB_TOKEN)
+            print(f"llm_response: {llm_response}")
+            llm_response_file_path = html_file_path.split(".html")[0] + '_llm.txt'
+            with open(llm_response_file_path, "w") as out_file:
+                out_file.write(llm_response)
+
+            # Create calendar events and send self an email for summary.
 
         return {"emails": emails}
     except Exception as e:
@@ -217,7 +246,7 @@ async def get_calendar():
     return {"events": event_data}
 
 @app.post("/calendar/create")
-async def create_event():
+async def create_event(event: CalendarEvent):
     """
     Create a new calendar event with the title 'hello world' on '2025-04-22'.
     Requires the 'Calendars.ReadWrite' permission scope.
@@ -230,10 +259,19 @@ async def create_event():
     calendar = schedule.get_default_calendar()
 
     # Create a new event
+    print(event)
     new_event = calendar.new_event()
-    new_event.subject = "hello world"
-    new_event.start = datetime.fromisoformat("2025-04-22T09:00:00")  # Start time (adjust as needed)
-    new_event.end = datetime.fromisoformat("2025-04-22T10:00:00")    # End time (adjust as needed)
+    new_event.subject = event.subject
+    new_event.body = event.body
+    new_event.remind_before_minutes = event.remind_before_minutes
+    new_event.start = datetime.fromisoformat(event.start_date)
+    if event.end_date:
+        new_event.end = datetime.fromisoformat(event.end_date)
+    # new_event.subject = "hello world"
+    # new_event.body = "this is my summary."
+    # new_event.remind_before_minutes = 30  # Set reminder 10 minutes before the event
+    # new_event.start = datetime.fromisoformat("2025-04-22T09:00:00")  # Start time (adjust as needed)
+    # new_event.end = datetime.fromisoformat("2025-04-22T10:00:00")    # End time (adjust as needed)
 
     # Save the event
     if new_event.save():
