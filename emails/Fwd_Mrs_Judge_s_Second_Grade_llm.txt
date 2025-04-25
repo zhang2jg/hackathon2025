@@ -1,0 +1,78 @@
+Summary of School Letter
+
+The letter from Mrs. Judge provides an overview of the first week of second grade at Fulton Science Academy. Students are adjusting well to new routines and are excited about the upcoming playground. Parents are encouraged to use Class Dojo to monitor behavior and view classroom updates. Important reminders include sending in Friday folders, understanding dismissal times, and upcoming club rotations. The letter also highlights curriculum focuses for the coming week, provides a spelling list, and shares information about lunch ordering, classroom donations, and health policies. Several important dates and events are listed for August and September.
+
+Important Points
+
+- Students are settling into the second grade routines and curriculum.
+- Parents should sign up for Class Dojo to monitor behavior and see classroom photos.
+- The new playground is under construction and students are excited about it.
+- Friday folders should be sent in weekly for students to bring home their work.
+- Dismissal times vary by grade and day; clubs begin next week.
+- Club rotations: P-2 students are assigned clubs; 3-5 students submit preferences.
+- Parents must notify the school if their child will be picked up before clubs.
+- Curriculum focuses next week: reading/writing about inclusion, R-controlled E in phonics, graphing in math, science safety, and rules/laws in social studies.
+- Weekly spelling quizzes are for practice, not grades.
+- The school is nominated for Best K-12 Private School; parents can vote daily until August 15.
+- Lunch can be ordered through YAY Lunch; parents can create an account online.
+- Classroom Amazon Wish List is available for donations (no obligation).
+- Strict nut-free policy for snacks and lunches due to allergies.
+- Early checkout times are specified; after those times, students must be picked up via carpool.
+- Contact information for Mrs. Judge and Nurse Lee is provided.
+
+Upcoming Events
+
+Below is a list of upcoming events extracted from the letter:
+
+[
+  {
+    "subject": "New Parent Breakfast",
+    "start_date": "2024-08-10T09:30:00",
+    "end_date": "2024-08-10T10:30:00",
+    "description": "Breakfast event for new parents at Fulton Science Academy."
+  },
+  {
+    "subject": "Summer Reading Celebration",
+    "start_date": "2024-08-12T09:00:00",
+    "end_date": "2024-08-12T10:00:00",
+    "description": "Celebration for students who participated in summer reading."
+  },
+  {
+    "subject": "Spirit Day",
+    "start_date": "2024-08-16T09:00:00",
+    "end_date": "2024-08-16T10:00:00",
+    "description": "Students are encouraged to show school spirit."
+  },
+  {
+    "subject": "Dress Down Day",
+    "start_date": "2024-08-16T09:00:00",
+    "end_date": "2024-08-16T10:00:00",
+    "description": "Students may dress down instead of wearing uniforms."
+  },
+  {
+    "subject": "Spirit Day",
+    "start_date": "2024-08-23T09:00:00",
+    "end_date": "2024-08-23T10:00:00",
+    "description": "Students are encouraged to show school spirit."
+  },
+  {
+    "subject": "3rd-5th Curriculum Night",
+    "start_date": "2024-08-27T17:00:00",
+    "end_date": "2024-08-27T18:30:00",
+    "description": "Curriculum Night for 3rd-5th grade parents."
+  },
+  {
+    "subject": "PreK-2nd Curriculum Night",
+    "start_date": "2024-08-29T17:00:00",
+    "end_date": "2024-08-29T18:30:00",
+    "description": "Curriculum Night for PreK-2nd grade parents."
+  },
+  {
+    "subject": "Labor Day Holiday (No School)",
+    "start_date": "2024-09-01T00:00:00",
+    "end_date": "2024-09-01T23:59:59",
+    "description": "School closed for Labor Day holiday."
+  }
+]
+
+If you need more details about any event or another section of the letter, let me know!
