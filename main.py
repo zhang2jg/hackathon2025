@@ -267,11 +267,6 @@ async def create_event(event: CalendarEvent):
     new_event.start = datetime.fromisoformat(event.start_date)
     if event.end_date:
         new_event.end = datetime.fromisoformat(event.end_date)
-    # new_event.subject = "hello world"
-    # new_event.body = "this is my summary."
-    # new_event.remind_before_minutes = 30  # Set reminder 10 minutes before the event
-    # new_event.start = datetime.fromisoformat("2025-04-22T09:00:00")  # Start time (adjust as needed)
-    # new_event.end = datetime.fromisoformat("2025-04-22T10:00:00")    # End time (adjust as needed)
 
     # Save the event
     if new_event.save():
