@@ -1,7 +1,6 @@
 import os
 from fastapi import FastAPI, Request, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
-from pydantic import BaseModel
 from O365 import Account, FileSystemTokenBackend
 from dotenv import load_dotenv
 from datetime import datetime
@@ -9,7 +8,12 @@ from pathlib import Path
 import re
 import os
 import subprocess
-from utils import ocr_pdf, run_llm
+from pathlib import Path
+
+from agents.calendar_agent import call_calendar_agent
+from utils import ocr_pdf, run_llm, CalendarEvent, create_calendar_event
+from agents import calendar_agent
+from auth import outlook_account
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -17,10 +21,10 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 load_dotenv()
 
 # Environment variables
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+# CLIENT_ID = os.getenv("CLIENT_ID")
+# CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
-TOKEN_FILENAME = os.getenv("TOKEN_FILENAME", "o365_tokens")
+# TOKEN_FILENAME = os.getenv("TOKEN_FILENAME", "o365_tokens")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SCOPES = ['Mail.Read', 'Calendars.ReadWrite']  # Adjust the scopes as per your needs
 wkhtmltopdf_path = "/mnt/c/tmp/wkhtmltopdf/bin/wkhtmltopdf.exe"
@@ -28,20 +32,14 @@ wkhtmltopdf_path = "/mnt/c/tmp/wkhtmltopdf/bin/wkhtmltopdf.exe"
 # Initialize FastAPI
 app = FastAPI()
 
-# Configure the O365 Account with FirestoreTokenBackend (or customize it)
-token_backend = None
-if TOKEN_FILENAME:
-    token_backend = FileSystemTokenBackend(token_path='./tokens', token_filename=TOKEN_FILENAME)
+# # Configure the O365 Account with FirestoreTokenBackend (or customize it)
+# token_backend = None
+# if TOKEN_FILENAME:
+#     token_backend = FileSystemTokenBackend(token_path='./tokens', token_filename=TOKEN_FILENAME)
+#
+# account = Account((CLIENT_ID, CLIENT_SECRET), token_backend=token_backend)
 
-account = Account((CLIENT_ID, CLIENT_SECRET), token_backend=token_backend)
-
-
-class CalendarEvent(BaseModel):
-    subject: str
-    body: str
-    start_date: str = None
-    end_date: str = None
-    remind_before_minutes: int = 30
+account = outlook_account
 
 def run_powershell_command(command):
     """Executes a PowerShell command and returns the output."""
@@ -167,30 +165,44 @@ async def get_emails():
 
             # Convert the HTML file to PDF
             pdf_file_path = html_file_path.split(".html")[0] + '.pdf'
-            command = [wkhtmltopdf_path, html_file_path, pdf_file_path]
-            print(f"subprocess command: {command}")
-            output = run_powershell_command(command)
-            print(f"subprocess output: {output}")
+            if not Path(pdf_file_path).exists():
+                command = [wkhtmltopdf_path, html_file_path, pdf_file_path]
+                print(f"subprocess command: {command}")
+                output = run_powershell_command(command)
+                print(f"subprocess output: {output}")
+            else:
+                print(f"PDF file already exists: {pdf_file_path}. Skipping conversion.")
 
             # Run ocr to extract text from the pdf
             txt_file_path = html_file_path.split(".html")[0] + '.txt'
-            print("OCR in progress....")
-            ocr_text = ocr_pdf(pdf_file_path)
-            with open(txt_file_path, "w") as out_file:
-                out_file.write(ocr_text)
-            print("OCR completed.")
+            if not Path(txt_file_path).exists():
+                print("OCR in progress....")
+                ocr_text = ocr_pdf(pdf_file_path)
+                with open(txt_file_path, "w") as out_file:
+                    out_file.write(ocr_text)
+                print("OCR completed.")
+            else:
+                ocr_text = None
+                print(f"Text file already exists: {txt_file_path}. Skipping OCR.")
 
             # Run the LLM to extract events
-            print("Running LLM to summarize letter and extract events....")
-            llm_response = run_llm(ocr_text, token=GITHUB_TOKEN)
-            print(f"llm_response: {llm_response}")
             llm_response_file_path = html_file_path.split(".html")[0] + '_llm.txt'
-            with open(llm_response_file_path, "w") as out_file:
-                out_file.write(llm_response)
+            if not Path(llm_response_file_path).exists():
+                print("Running LLM to summarize letter and extract events....")
+                if ocr_text is None:
+                    with open(txt_file_path, "r") as in_file:
+                        ocr_text = in_file.read()
+                llm_response = run_llm(ocr_text, token=GITHUB_TOKEN)
+                print(f"llm_response: {llm_response}")
+                with open(llm_response_file_path, "w") as out_file:
+                    out_file.write(llm_response)
 
             # Create calendar events and send self an email for summary.
+            chat_result = call_calendar_agent(llm_response_file_path, config_list=[{"model": "gpt-4o",
+                                                            "api_key": GITHUB_TOKEN,
+                                                            "base_url": "https://models.inference.ai.azure.com"}])
 
-        return {"emails": emails}
+        return f'Calendar events created for Subject: {email_data['subject']}.\n Summary:\n{chat_result.summary}'
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch emails or download attachments: {str(e)}")
 
@@ -254,25 +266,11 @@ async def create_event(event: CalendarEvent):
     if not account.is_authenticated:
         return RedirectResponse("/")  # Redirect to home if not authenticated
 
-    # Access the calendar
-    schedule = account.schedule()
-    calendar = schedule.get_default_calendar()
-
     # Create a new event
-    print(event)
-    new_event = calendar.new_event()
-    new_event.subject = event.subject
-    new_event.body = event.body
-    new_event.remind_before_minutes = event.remind_before_minutes
-    new_event.start = datetime.fromisoformat(event.start_date)
-    if event.end_date:
-        new_event.end = datetime.fromisoformat(event.end_date)
-
-    # Save the event
-    if new_event.save():
-        return {"message": "Event created successfully"}
-    else:
-        raise HTTPException(status_code=500, detail="Failed to create event")
+    msg = create_calendar_event(event=event)
+    if 'failed' in msg:
+        raise HTTPException(status_code=400, detail="Failed to create calendar event")
+    return {"message": msg}
 
 
 if __name__ == "__main__":

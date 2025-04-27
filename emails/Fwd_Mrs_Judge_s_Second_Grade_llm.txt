@@ -1,61 +1,64 @@
 Summary of the School Letter
 
-The letter from Mrs. Judge provides an update on the first week of second grade at Fulton Science Academy. Students are adjusting well to new routines and are excited about the upcoming playground. Parents are encouraged to use Class Dojo to monitor their child's behavior and see classroom updates. Important reminders include sending in the Friday folder weekly, reviewing student work at home, and being aware of dismissal and club procedures. Several upcoming events are listed, and the school requests support in voting for the Best K-12 Private School award. Additional notes cover lunch ordering, classroom wish lists, and nut allergy precautions.
+The letter from Mrs. Judge recaps a successful first week of second grade at Fulton Science Academy. Students are learning new routines, and parents are encouraged to use Class Dojo to track behavior and see classroom updates. The school is excited about the new playground under construction. Parents are reminded to send Friday folders each week and to review their child’s work at home. Dismissal times and club information are provided, with clubs starting next week. Several important upcoming events are listed, including Curriculum Nights and a New Parent Breakfast. The letter also includes curriculum updates for reading, math, science, and social studies, as well as spelling words for the week. Parents are reminded about nut allergies, early checkout procedures, and ways to support the classroom through wish lists and lunch ordering. The school is nominated for the Best K-12 Private School award, and parents are encouraged to vote.
 
 Important Points
 
-1. Students are settling into second grade routines and curriculum.
-2. Parents should sign up for Class Dojo for behavior updates and classroom photos.
-3. The new playground is under construction and anticipated soon.
-4. Send in your child’s Friday folder each week to receive and review their work.
-5. Dismissal times and club procedures differ by grade and day; notify the teacher if your child will not attend clubs.
-6. Clubs for grades 3-5 require preference forms; P-2 students are assigned clubs.
-7. Upcoming events include New Parent Breakfast, Curriculum Nights, and Labor Day holiday.
-8. Weekly spelling quizzes are for practice, not grades.
-9. Nut-free snacks and lunches are required due to severe allergies.
-10. Early checkout times are enforced; late arrivals must use carpool.
-11. The school is nominated for Best K-12 Private School; daily voting is encouraged.
-12. Lunch can be ordered through YAY Lunch.
-13. Classroom wish list is available for donations (no obligation).
-14. Contact Nurse Lee for health-related questions.
+- Successful first full week of school; students adjusting well to second grade routines.
+- Parents should use Class Dojo to track behavior and see classroom updates.
+- New playground construction is underway.
+- Send in Friday folders weekly to receive and review student work.
+- Dismissal times and club schedules are provided; clubs begin next week.
+- Club preference forms for grades 3-5 are sent via email; P-2 students have assigned club rotations.
+- Notify the teacher if your child will be picked up before clubs.
+- Upcoming events include New Parent Breakfast, Curriculum Nights, and Labor Day holiday.
+- Weekly curriculum updates in reading, math, science, and social studies.
+- Weekly spelling words provided for practice.
+- School nominated for Best K-12 Private School; parents can vote daily until August 15.
+- Class Dojo used for behavior tracking by all teachers.
+- Lunch can be ordered through YA Y Lunch.
+- Amazon Wish List available for classroom donations.
+- Strict nut-free policy in place; contact Nurse Lee with questions.
+- Early checkout times specified for Monday-Thursday and Friday.
+- School contact information and teacher contact details provided.
 
 Upcoming Events
 
 [
   {
     "subject": "New Parent Breakfast",
-    "start_date": "2024-08-10T09:30:00",
-    "end_date": "2024-08-10T10:30:00",
-    "description": "Breakfast event for new parents to meet and learn more about the school."
-  },
-  {
-    "subject": "3rd-5th Curriculum Night",
-    "start_date": "2024-08-27T17:00:00",
-    "end_date": "2024-08-27T18:00:00",
-    "description": "Curriculum Night for 3rd through 5th grade families."
-  },
-  {
-    "subject": "PreK-2nd Curriculum Night",
-    "start_date": "2024-08-29T17:00:00",
-    "end_date": "2024-08-29T18:00:00",
-    "description": "Curriculum Night for PreK through 2nd grade families."
-  },
-  {
-    "subject": "Labor Day Holiday (No School)",
-    "start_date": "2024-09-01T00:00:00",
-    "end_date": "2024-09-01T23:59:59",
-    "description": "Labor Day Holiday. No school for students and staff."
-  },
-  {
-    "subject": "Voting for Best K-12 Private School",
-    "start_date": "2024-08-09T00:00:00",
-    "end_date": "2024-08-15T23:59:59",
-    "description": "Vote daily for Fulton Science Academy as Best K-12 Private School in the Best of North Atlanta Awards."
+    "start_date": "2025-08-10T09:30:00",
+    "end_date": "2025-08-10T10:30:00",
+    "description": "Breakfast event for new parents to meet and learn about the school."
   },
   {
     "subject": "FSA Clubs Begin",
-    "start_date": "2024-08-12T00:00:00",
-    "end_date": "2024-08-12T01:00:00",
-    "description": "FSA clubs begin for the school year. Club assignments and preferences apply."
+    "start_date": "2025-08-12T09:00:00",
+    "end_date": "2025-08-12T10:00:00",
+    "description": "First day of after-school clubs for students. Club rotations for P-2; club preferences for grades 3-5."
+  },
+  {
+    "subject": "Voting for Best K-12 Private School Ends",
+    "start_date": "2025-08-15T23:59:00",
+    "end_date": "2025-08-16T00:59:00",
+    "description": "Last day to vote for Fulton Science Academy in the Best of North Atlanta Awards."
+  },
+  {
+    "subject": "3rd-5th Curriculum Night",
+    "start_date": "2025-08-27T17:00:00",
+    "end_date": "2025-08-27T18:00:00",
+    "description": "Curriculum Night for 3rd-5th grade families."
+  },
+  {
+    "subject": "PreK-2nd Curriculum Night",
+    "start_date": "2025-08-29T17:00:00",
+    "end_date": "2025-08-29T18:30:00",
+    "description": "Curriculum Night for PreK-2nd grade families."
+  },
+  {
+    "subject": "Labor Day Holiday (No School)",
+    "start_date": "2025-09-01T00:00:00",
+    "end_date": "2025-09-01T23:59:00",
+    "description": "Labor Day holiday; no school for students or staff."
   }
 ]

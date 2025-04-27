@@ -2,4 +2,5 @@
 .idea/
 tokens/*
 */.cache
-
+.cache/
+*/__pycache__*/

@@ -2,7 +2,59 @@ import easyocr
 from pdf2image import convert_from_path
 from openai import OpenAI
 import numpy as np
+from pydantic import BaseModel
+from datetime import datetime
+from auth import outlook_account
 
+
+class CalendarEvent(BaseModel):
+    subject: str
+    body: str
+    start_date: str = None
+    end_date: str = None
+    remind_before_minutes: int = 30
+
+
+def create_calendar_event(event: CalendarEvent) -> str:
+    """
+    Create a calendar event.
+    """
+    # Access the calendar
+    schedule = outlook_account.schedule()
+    calendar = schedule.get_default_calendar()
+
+    # Create a new event
+    new_event = calendar.new_event()
+    new_event.subject = event.subject
+    new_event.body = event.body
+    new_event.remind_before_minutes = event.remind_before_minutes
+    new_event.start = datetime.fromisoformat(event.start_date)
+    if event.end_date:
+        new_event.end = datetime.fromisoformat(event.end_date)
+
+    # Save the event
+    new_event_saved = new_event.save()
+    if new_event_saved:
+        return f"Event created successfully. Subject: {event.subject}"
+    else:
+        return f"Event failed to create. Subject: {event.subject}"
+
+
+# def create_calendar_event(
+#     subject: str,
+#     start_date: str,
+#     end_date: str,
+#     description: str
+# ) -> str:
+#     """
+#     Create a calendar event.
+#     """
+#     return f"""
+# Subject: '{subject}'
+# Start_date: {start_date}
+# End_date: {end_date}
+# Description: {description}
+# """
 
 def ocr_pdf(pdf_path, lang_list=['en']):
     # Convert PDF pages to images
@@ -36,6 +88,7 @@ def run_llm(text, token=None):
     - start_date: the start datetime of the event, e.g. "2025-04-22T09:00:00"
     - end_date: the end datetime of the event, e.g. "2025-04-22T09:00:00". If none, use start_date + 1 hour.
     - description: details of the event.
+    Default to use 2025 as the year for all events if not specified.
     Body of school letter is as follows:
     {}
     """
